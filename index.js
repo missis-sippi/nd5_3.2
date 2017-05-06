@@ -1,5 +1,4 @@
 "use strict";
-
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongodb = require('mongodb');
@@ -10,20 +9,21 @@ const port = process.env.port || 3000;
 const url = 'mongodb://localhost:27017/anothernewdb';
 
 let db;
+
 const contacts = [
   {firstname: "a", secondname: "aa", phone: "111"},
   {firstname: "b", secondname: "bb", phone: "222"},
-  {firstname: "c", secondname: "cc", phone: "333"}
+  {firstname: "c", secondname: "cc", phone: "333"},
+  {firstname: "d", secondname: "dd", phone: "444"}
 ];
 
 app.use(bodyParser.urlencoded({"extended": true}));
 app.use(bodyParser.json());
 
-app.get("/contacts", (req, res) => {
+app.get("/contacts", function(req, res) {
   db.collection('contacts').find().toArray(function(err, result) {
-    if (err) {
-      console.log(err);
-    } else {
+    if (err) console.log(err);
+    else {
       res.json({contacts: result});
     };
   });
@@ -68,7 +68,7 @@ app.put("/contacts/:id", function(req, res) {
 
 app.get("/contacts/:id", function(req, res) {
   db.collection('contacts').find({
-    name: req.body.name
+    firstname: req.body.firstname
   }).toArray(function(err, result) {
     if (err) console.log(err);
     else {
@@ -76,6 +76,7 @@ app.get("/contacts/:id", function(req, res) {
     };
   });
 });
+
 
 MongoClient.connect(url, function(err, database) {
   if (err) console.log(err);
@@ -85,7 +86,7 @@ MongoClient.connect(url, function(err, database) {
     collection.insert(contacts, function(err, result) {
       if (err) console.log(err);
     });
-    app.listen(port, () => {
+    app.listen(port, function() {
       console.log(`Listening to ${port}`);
     });
   }
