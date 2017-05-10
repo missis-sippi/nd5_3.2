@@ -17,8 +17,14 @@ const contacts = [
   {firstname: "d", secondname: "dd", phone: "444"}
 ];
 
+const newcontact = {firstname: "x", secondname: "z", phone: "999"};
+
 app.use(bodyParser.urlencoded({"extended": true}));
 app.use(bodyParser.json());
+
+app.get('/', function(req, res) {
+  res.send('- phonebook -')
+});
 
 app.get("/contacts", function(req, res) {
   db.collection('contacts').find().toArray(function(err, result) {
@@ -26,6 +32,15 @@ app.get("/contacts", function(req, res) {
     else {
       res.json({contacts: result});
     };
+  });
+});
+
+app.get("/contacts/:id", function(req, res) {
+  db.collection('contacts').insert(newcontact, function(err, result) {
+    if (err) console.error(err);
+    else {
+      res.send(result);
+    }
   });
 });
 
@@ -66,17 +81,31 @@ app.put("/contacts/:id", function(req, res) {
   );
 });
 
-app.get("/contacts/:id", function(req, res) {
-  db.collection('contacts').find({
-    firstname: req.body.firstname
-  }).toArray(function(err, result) {
-    if (err) console.log(err);
-    else {
-      res.json({contacts: result});
-    };
-  });
+app.delete("/contacts/:id", function(req, res) {
+    let id = req.params.id;
+    database.collection('users').deleteOne(
+      { "_id" : new mongodb.ObjectID(id) }, function(err, result) {
+        if (err) console.log(err);
+        else if (result) {
+          res.json(result);
+        } 
+        else {
+          res.json({ message: 'Запись о контакте не найдена' });
+        };
+      }); 
 });
 
+app.delete("/contacts", function(req, res) {
+    database.collection('users').deleteMany({}, function(err, result) {
+      if (err) console.log(err);
+      else if (result) {
+        res.json(result);
+      } 
+      else {
+        res.json({ message: 'Запись о контакте не найдена' });
+      };
+    });
+});
 
 MongoClient.connect(url, function(err, database) {
   if (err) console.log(err);
